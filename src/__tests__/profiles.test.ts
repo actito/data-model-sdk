@@ -82,7 +82,7 @@ describe("profile", () => {
     expect(profileId.toString()).toBe("7");
   });
 
-  it("register profile webhook", async () => {
+  it("registers webhook", async () => {
     mocked.mockImplementationOnce(() => ({ ok: true, json: () => ({ id: 123 }) }));
     const { id } = await registerWebhook(PROFILE_TABLE, WebhookType.CREATE, "https://www.example.com", true);
     expectFetch({
