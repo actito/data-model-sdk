@@ -1,6 +1,7 @@
 import { init } from "../init";
-import { addRecord, deleteRecord, getRecord, getRecords, increment, updateRecord } from "../tables";
+import { addRecord, deleteRecord, getRecord, getRecords, increment, updateRecord, registerWebhook } from "../tables";
 import { checkLastCall, credentials } from "./helpers";
+import { WebhookType } from "../types";
 
 const CUSTOM_TABLE = "OfferAssignments";
 const RECORD_ID = "20";
@@ -93,6 +94,19 @@ describe("tables", () => {
       url: `https://test.actito.be/ActitoWebServices/ws/v4/entity/product/customTable/${CUSTOM_TABLE}/record/${RECORD_ID}`,
       options: { method: "DELETE" }
     });
+  });
+
+  it("register profile webhook", async () => {
+    mocked.mockImplementationOnce(() => ({ ok: true, json: () => ({ id: 123 }) }));
+    const { id } = await registerWebhook(CUSTOM_TABLE, WebhookType.CREATE, "https://www.example.com", true);
+    expectFetch({
+      url: `https://test.actito.be/ActitoWebServices/ws/v4/entity/product/customTable/${CUSTOM_TABLE}/webhookSubscription`,
+      options: {
+        method: "POST",
+        body: '{"eventType":"CREATE","isActive":true,"targetUrl":"https://www.example.com"}'
+      }
+    });
+    expect(id.toString()).toBe("123");
   });
 
   it("increments record", async () => {
