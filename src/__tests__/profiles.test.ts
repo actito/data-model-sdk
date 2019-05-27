@@ -1,6 +1,6 @@
 import { init } from "../init";
-import { createProfile, deleteProfile, getProfile, getProfiles, updateProfile } from "../profiles";
-import { IAPIProfileBody, IProfileRecord } from "../types";
+import { createProfile, deleteProfile, getProfile, getProfiles, updateProfile, registerWebhook } from "../profiles";
+import { IAPIProfileBody, IProfileRecord, WebhookType } from "../types";
 import { checkLastCall, credentials } from "./helpers";
 
 const PROFILE_TABLE = "Clients";
@@ -80,6 +80,19 @@ describe("profile", () => {
       }
     });
     expect(profileId.toString()).toBe("7");
+  });
+
+  it("registers webhook", async () => {
+    mocked.mockImplementationOnce(() => ({ ok: true, json: () => ({ id: 123 }) }));
+    const { id } = await registerWebhook(PROFILE_TABLE, WebhookType.CREATE, "https://www.example.com", true);
+    expectFetch({
+      url: "https://test.actito.be/ActitoWebServices/ws/v4/entity/product/table/Clients/webhookSubscription",
+      options: {
+        method: "POST",
+        body: '{"eventType":"CREATE","isActive":true,"targetUrl":"https://www.example.com"}'
+      }
+    });
+    expect(id.toString()).toBe("123");
   });
 
   it("deletes profile", async () => {
