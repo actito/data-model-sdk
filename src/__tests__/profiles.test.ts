@@ -1,13 +1,18 @@
 import { init } from "../init";
-import { createProfile, deleteProfile, getProfile, getProfiles, updateProfile, registerWebhook } from "../profiles";
+import { createProfile, deleteProfile, getProfile, getProfiles, updateProfile, registerWebhook, increment } from "../profiles";
 import { IAPIProfileBody, IProfileRecord, WebhookType } from "../types";
-import { checkLastCall, credentials } from "./helpers";
+import { checkLastCall, checkCall, credentials } from "./helpers";
 
 const PROFILE_TABLE = "Clients";
 
 let mocked: jest.Mock<any, any>;
 const dummyProfile: IAPIProfileBody = {
-  attributes: [{ name: "profileId", value: "7" }],
+  attributes: [{ name: "profileId", value: "7" }, { name: "value", value: "1" }],
+  subscriptions: [],
+  segmentations: []
+};
+const emptyProfile: IAPIProfileBody = {
+  attributes: [],
   subscriptions: [],
   segmentations: []
 };
@@ -21,6 +26,7 @@ jest.mock("node-fetch", () => {
 
 describe("profile", () => {
   const expectFetch = checkLastCall(mocked);
+  const expectFetchOrder = checkCall(mocked);
   init(credentials);
 
   it("fails on non initialized", async () => {
@@ -102,5 +108,49 @@ describe("profile", () => {
       url: "https://test.actito.be/ActitoWebServices/ws/v4/entity/product/table/Clients/profile/7",
       options: { method: "DELETE" }
     });
+  });
+
+  it("increments profile field", async () => {
+    mocked.mockReset();
+    mocked
+      .mockImplementationOnce(() => ({ ok: true, json: () => dummyProfile }))
+      .mockImplementationOnce(() => ({ ok: true, json: () => { } }));
+    await increment(PROFILE_TABLE, "7", "value", 1);
+    expectFetchOrder(1, {
+      url: `https://test.actito.be/ActitoWebServices/ws/v4/entity/product/table/${PROFILE_TABLE}/profile/7`,
+      options: { method: "GET" }
+    });
+    expectFetchOrder(2, {
+      url: `https://test.actito.be/ActitoWebServices/ws/v4/entity/product/table/${PROFILE_TABLE}/profile/7`,
+      options: {
+        method: "PUT",
+        body: JSON.stringify({ "attributes": [{ "name": "value", "value": "2" }] })
+      }
+    });
+  });
+
+  it("increments undefined field in profile", async () => {
+    mocked.mockReset();
+    mocked
+      .mockImplementationOnce(() => ({ ok: true, json: () => dummyProfile }))
+      .mockImplementationOnce(() => ({ ok: true, json: () => { } }));
+    await increment(PROFILE_TABLE, "7", "otherValue", 1);
+    expectFetchOrder(1, {
+      url: `https://test.actito.be/ActitoWebServices/ws/v4/entity/product/table/${PROFILE_TABLE}/profile/7`,
+      options: { method: "GET" }
+    });
+    expectFetchOrder(2, {
+      url: `https://test.actito.be/ActitoWebServices/ws/v4/entity/product/table/${PROFILE_TABLE}/profile/7`,
+      options: {
+        method: "PUT",
+        body: JSON.stringify({ "attributes": [{ "name": "otherValue", "value": "1" }] })
+      }
+    });
+  });
+
+  it("increments no profile data", async () => {
+    mocked.mockReset();
+    mocked.mockImplementationOnce(() => ({ ok: true, json: () => emptyProfile }));
+    await expect(increment(PROFILE_TABLE, "7", "value", 1)).rejects.toEqual(new Error('no profile data for 7'));
   });
 });

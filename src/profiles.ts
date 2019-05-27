@@ -44,9 +44,9 @@ export async function registerWebhook(table: string, type: WebhookType, targetUr
 
 export async function increment(table: string, profileId: string, field: string, incrementValue: number) {
   const profile = await getProfile(table, profileId);
-  if (!profile.profile)
-    throw Error('no profile data for ' + profileId);
-  const previousValue: number = JSON.parse(profile.profile[field]) || 0;
-  await updateProfile(table, profileId, { [field]: previousValue + incrementValue });
-  return true;
+  if (!profile.profile || Object.keys(profile.profile).length == 0)
+    throw new Error('no profile data for ' + profileId);
+  const previousValue: number = JSON.parse(profile.profile[field] || "0");
+  const profileRecord: IProfileRecord = { profile: { [field]: JSON.stringify(previousValue + incrementValue) } };
+  await updateProfile(table, profileId, profileRecord);
 }

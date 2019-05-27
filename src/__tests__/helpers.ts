@@ -18,3 +18,10 @@ export const checkLastCall = (mocked: jest.Mock<any, any>) => (callMatch: ICallM
   expect(url).toBe(callMatch.url);
   expect(options).toMatchObject(callMatch.options);
 };
+
+export const checkCall = (mocked: jest.Mock<any, any>) => (callNumber: number, callMatch: ICallMatch) => {
+  const calls = mocked.mock.calls;
+  const [url, options] = calls[callNumber - 1];
+  expect(url).toBe(callMatch.url);
+  expect(options).toMatchObject(callMatch.options);
+};
