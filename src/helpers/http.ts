@@ -17,12 +17,13 @@ export const init = (credentials: IActitoCredentials) => {
   actitoCredentials = credentials;
 };
 
-const actitoFetch = (method: "GET" | "POST" | "PUT" | "DELETE") => async (path: string, body?: object) => {
+const actitoFetch = (method: "GET" | "POST" | "PUT" | "DELETE") => async (path: string, body?: object, overrideCredentials?: IActitoCredentials) => {
+  const credentials = { ...actitoCredentials, ...overrideCredentials };
   const headers = {
     "Content-Type": "application/json",
-    Authorization: "Basic " + Buffer.from(actitoCredentials.user + ":" + actitoCredentials.password).toString("base64")
+    Authorization: "Basic " + Buffer.from(credentials.user + ":" + credentials.password).toString("base64")
   };
-  const url = `${environmentUrlMap[actitoCredentials.env]}/entity/${actitoCredentials.entity}/${path}`;
+  const url = `${environmentUrlMap[credentials.env]}/entity/${credentials.entity}/${path}`;
   const bodyOption = body ? { body: JSON.stringify(body) } : {};
   const response = await fetch(url, { headers, ...bodyOption, method });
   if (!response.ok) {
