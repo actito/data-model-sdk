@@ -41,3 +41,12 @@ export async function deleteProfile(table: string, profileId: string) {
 export async function registerWebhook(table: string, type: WebhookType, targetUrl: string, isActive: boolean, onFields?: string[], headers?: { [key: string]: string }) {
   return await actitoPost(`table/${table}/webhookSubscription`, webhookBody(targetUrl, type, isActive, onFields, headers));
 }
+
+export async function increment(table: string, profileId: string, field: string, incrementValue: number) {
+  const profile = await getProfile(table, profileId);
+  if (!profile.profile)
+    throw Error('no profile data for ' + profileId);
+  const previousValue: number = JSON.parse(profile.profile[field]) || 0;
+  await updateProfile(table, profileId, { [field]: previousValue + incrementValue });
+  return true;
+}
