@@ -63,3 +63,19 @@ export interface IProfileRecord {
     way: string;
   };
 }
+
+export enum WebhookType {
+  CREATE = "CREATE",
+  UPDATE = "UPDATE",
+  DELETE = "DELETE",
+  UPDATED_SUBSCRIPTION = "UPDATED_SUBSCRIPTION",
+  UPDATED_SEGMENT = "UPDATED_SEGMENT"
+}
+
+export interface IAPIWebhookBody {
+  eventType: WebhookType,
+  headers?: { [key: string]: string },
+  isActive: boolean,
+  onFields?: string[],
+  targetUrl: string
+}

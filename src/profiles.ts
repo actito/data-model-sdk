@@ -1,6 +1,7 @@
 import { actitoDelete, actitoGet, actitoPost, actitoPut } from "./helpers/http";
 import { apiProfileToProfile, profileToAPIProfile } from "./helpers/translators";
-import { IProfileRecord } from "./types";
+import { webhookBody } from "./helpers/builders";
+import { IProfileRecord, WebhookType } from "./types";
 
 export async function createProfile(table: string, profileSpec: IProfileRecord): Promise<{ profileId: string }> {
   return await actitoPost(`table/${table}/profile`, profileToAPIProfile(profileSpec));
@@ -35,4 +36,8 @@ export async function updateProfile(
 
 export async function deleteProfile(table: string, profileId: string) {
   await actitoDelete(`table/${table}/profile/${profileId}`);
+}
+
+export async function registerWebhook(table: string, type: WebhookType, targetUrl: string, isActive: boolean, onFields?: string[], headers?: { [key: string]: string }) {
+  return await actitoPost(`table/${table}/webhookSubscription`, webhookBody(targetUrl, type, isActive, onFields, headers));
 }
