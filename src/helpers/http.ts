@@ -2,6 +2,7 @@ import fetch from "node-fetch";
 import { IActitoCredentials } from "../types";
 
 const environmentUrlMap = {
+  dev: "https://development.actito.be/ActitoWebServices/ws/v4",
   test: "https://test.actito.be/ActitoWebServices/ws/v4",
   prod: "https://www.actito.be/ActitoWebServices/ws/v4"
 };
@@ -17,7 +18,11 @@ export const init = (credentials: IActitoCredentials) => {
   actitoCredentials = credentials;
 };
 
-const actitoFetch = (method: "GET" | "POST" | "PUT" | "DELETE") => async (path: string, body?: object, overrideCredentials?: IActitoCredentials) => {
+const actitoFetch = (method: "GET" | "POST" | "PUT" | "DELETE") => async (
+  path: string,
+  body?: object,
+  overrideCredentials?: IActitoCredentials
+) => {
   const credentials = { ...actitoCredentials, ...overrideCredentials };
   const headers = {
     "Content-Type": "application/json",
