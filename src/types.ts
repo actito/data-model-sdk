@@ -2,7 +2,7 @@ export interface IActitoCredentials {
   user: string;
   password: string;
   entity: string;
-  env: "test" | "prod";
+  env: "dev" | "test" | "prod";
 }
 
 export interface IAPIProperty {
@@ -23,16 +23,16 @@ export interface IAPISort {
 // TODO: add translator for segmentation
 export type ISegmentation =
   | {
-    category: string;
-    name: string;
-  }
+      category: string;
+      name: string;
+    }
   | {
-    belongs: true;
-    segmentation: {
-      category: "string";
-      name: "string";
+      belongs: true;
+      segmentation: {
+        category: "string";
+        name: "string";
+      };
     };
-  };
 
 // TODO: add translator for subscription
 export interface ISubscription {
@@ -73,9 +73,9 @@ export enum WebhookType {
 }
 
 export interface IAPIWebhookBody {
-  eventType: WebhookType,
-  headers?: { [key: string]: string },
-  isActive: boolean,
-  onFields?: string[],
-  targetUrl: string
+  eventType: WebhookType;
+  headers?: { [key: string]: string };
+  isActive: boolean;
+  onFields?: string[];
+  targetUrl: string;
 }

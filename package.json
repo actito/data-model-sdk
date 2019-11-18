@@ -1,7 +1,7 @@
 {
   "name": "@actito/data-model-sdk",
   "private": false,
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "SDK for ACTITO data model (profile tables, linked tables and content tables)",
   "main": "lib/index.js",
   "scripts": {
