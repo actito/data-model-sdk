@@ -1,6 +1,6 @@
+import { webhookBody } from "./helpers/builders";
 import { actitoDelete, actitoGet, actitoPost, actitoPut } from "./helpers/http";
 import { objectToProperties, propertiesToObject } from "./helpers/translators";
-import { webhookBody } from "./helpers/builders";
 import { IAPIProperty, IAPISearch, IAPISort, WebhookType } from "./types";
 
 export async function addRecord(tableId: string, record: object) {
@@ -39,6 +39,16 @@ export async function deleteRecord(tableId: string, recordId: string) {
   return await actitoDelete(`customTable/${tableId}/record/${recordId}`);
 }
 
-export async function registerWebhook(table: string, type: WebhookType, targetUrl: string, isActive: boolean, onFields?: string[], headers?: { [key: string]: string }) {
-  return await actitoPost(`customTable/${table}/webhookSubscription`, webhookBody(targetUrl, type, isActive, onFields, headers));
+export async function registerWebhook(
+  table: string,
+  type: WebhookType,
+  targetUrl: string,
+  isActive: boolean,
+  onFields?: string[],
+  headers?: { [key: string]: string }
+) {
+  return await actitoPost(
+    `customTable/${table}/webhookSubscription`,
+    webhookBody(targetUrl, type, isActive, onFields, headers)
+  );
 }
